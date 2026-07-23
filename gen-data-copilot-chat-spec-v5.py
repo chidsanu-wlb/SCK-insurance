@@ -76,8 +76,8 @@ def get_random_birthdate_for_adult(status_type, advance_days):
         min_days = int(65 * 365.25) + advance_days + 1
         max_days = int(66 * 365.25)
     else:
-        min_days = int(20 * 365.25)
-        max_days = int(30 * 365.25)
+        min_days = int(40 * 365.25)
+        max_days = int(60 * 365.25)
     days_ago = random.randint(min_days, max_days)
     return RENEWAL_DATE - timedelta(days=days_ago)
 
