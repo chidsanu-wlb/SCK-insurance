@@ -319,3 +319,219 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# ====================================================
+# Part 3
+# Family Case Implementations
+# ====================================================
+
+# ----------------------------------------------------
+# Family Case Builders
+# ----------------------------------------------------
+
+def build_case_1(advance_days):
+    """คนซื้อ + คู่สมรส"""
+    b = FamilyBuilder(advance_days)
+    b.spouse()
+    return b.build()
+
+
+def build_case_2(advance_days):
+    """คนซื้อ + คู่สมรส + ลูก 1"""
+    b = FamilyBuilder(advance_days)
+    b.spouse()
+    b.child(1)
+    return b.build()
+
+
+def build_case_3(advance_days):
+    """คนซื้อ + คู่สมรส + ลูก 2"""
+    b = FamilyBuilder(advance_days)
+    b.spouse()
+    b.child(1)
+    b.child(2)
+    return b.build()
+
+
+def build_case_4(advance_days):
+    """คนซื้อ + ลูก 1"""
+    b = FamilyBuilder(advance_days)
+    b.child(1)
+    return b.build()
+
+
+def build_case_5(advance_days):
+    """คนซื้อ + ลูก 2"""
+    b = FamilyBuilder(advance_days)
+    b.child(1)
+    b.child(2)
+    return b.build()
+
+
+def build_case_6(advance_days):
+    """คู่สมรสอายุเกิน + ลูกอายุเกิน"""
+    b = FamilyBuilder(advance_days)
+    b.spouse(over_age=True)
+    b.child(1, over_age=True)
+    return b.build()
+
+
+def build_case_7(advance_days):
+    """คู่สมรสเสียชีวิต + ลูกเสียชีวิต"""
+    b = FamilyBuilder(advance_days)
+    b.spouse(alive=False)
+    b.child(1, alive=False)
+    return b.build()
+
+
+def build_case_8(advance_days):
+    """คู่สมรสอายุเกิน + ลูก1อายุเกิน"""
+    b = FamilyBuilder(advance_days)
+    b.spouse(over_age=True)
+    b.child(1, over_age=True)
+    return b.build()
+
+
+def build_case_9(advance_days):
+    """คู่สมรสอายุเกิน"""
+    b = FamilyBuilder(advance_days)
+    b.spouse(over_age=True)
+    return b.build()
+
+
+def build_case_10(advance_days):
+    """ลูก1อายุเกิน"""
+    b = FamilyBuilder(advance_days)
+    b.child(1, over_age=True)
+    return b.build()
+
+
+def build_case_11(advance_days):
+    """ลูก2คนอายุเกิน"""
+    b = FamilyBuilder(advance_days)
+    b.child(1, over_age=True)
+    b.child(2, over_age=True)
+    return b.build()
+
+
+def build_case_12(advance_days):
+    """คู่สมรสเสียชีวิต + ลูก1อายุเกิน"""
+    b = FamilyBuilder(advance_days)
+    b.spouse(alive=False)
+    b.child(1, over_age=True)
+    return b.build()
+
+
+def build_case_13(advance_days):
+    """คู่สมรสเสียชีวิต + ลูก2อายุเกิน"""
+    b = FamilyBuilder(advance_days)
+    b.spouse(alive=False)
+    b.child(1, over_age=True)
+    b.child(2, over_age=True)
+    return b.build()
+
+
+def build_case_14(advance_days):
+    """คู่สมรสเสียชีวิต"""
+    b = FamilyBuilder(advance_days)
+    b.spouse(alive=False)
+    return b.build()
+
+
+def build_case_15(advance_days):
+    """ลูกเสียชีวิต"""
+    b = FamilyBuilder(advance_days)
+    b.child(1, alive=False)
+    return b.build()
+
+
+# ----------------------------------------------------
+# Personal (No Family)
+# ----------------------------------------------------
+
+def build_personal_case(advance_days):
+    """
+    SCK Personal
+    """
+    b = FamilyBuilder(advance_days)
+    return b.build()
+
+
+# ----------------------------------------------------
+# Case Lookup Table
+# ----------------------------------------------------
+
+CASE_BUILDERS = {
+    "กรณีที่ 1": build_case_1,
+    "กรณีที่ 2": build_case_2,
+    "กรณีที่ 3": build_case_3,
+    "กรณีที่ 4": build_case_4,
+    "กรณีที่ 5": build_case_5,
+    "กรณีที่ 6": build_case_6,
+    "กรณีที่ 7": build_case_7,
+    "กรณีที่ 8": build_case_8,
+    "กรณีที่ 9": build_case_9,
+    "กรณีที่ 10": build_case_10,
+    "กรณีที่ 11": build_case_11,
+    "กรณีที่ 12": build_case_12,
+    "กรณีที่ 13": build_case_13,
+    "กรณีที่ 14": build_case_14,
+    "กรณีที่ 15": build_case_15,
+}
+
+
+# ----------------------------------------------------
+# Main Family Dispatcher
+# ----------------------------------------------------
+
+def build_family(bundle, family, advance_days):
+    """
+    Parameters
+    ----------
+    bundle : str
+    family : str
+    advance_days : int
+
+    Returns
+    -------
+    holder : Person
+    members : list[Person]
+    """
+
+    # SCK Personal
+    if bundle.strip().lower() == "sck personal":
+        return build_personal_case(advance_days)
+
+    # No family specified
+    if pd.isna(family):
+        return build_personal_case(advance_days)
+
+    family = str(family).strip()
+
+    if family not in CASE_BUILDERS:
+        raise ValueError(
+            f"Unknown Family Case : {family}"
+        )
+
+    return CASE_BUILDERS[family](advance_days)
+
+
+# ----------------------------------------------------
+# Status Formatter
+# ----------------------------------------------------
+
+def status_text(advance_days):
+    """
+    Output for Status column
+    """
+
+    expiry, start = calculate_policy_dates(
+        advance_days
+    )
+
+    return (
+        f"จำนวนวันที่ต่ออายุล่วงหน้า: {advance_days} วัน\n"
+        f"วันที่ต่ออายุ: {thai_date(RENEWAL_DATE)}\n"
+        f"วันสิ้นสุดความคุ้มครอง: {thai_date(expiry)}\n"
+        f"วันเริ่มสัญญาฉบับปัจจุบัน: {thai_date(start)}"
+    )
